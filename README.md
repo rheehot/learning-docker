@@ -21,7 +21,7 @@ Docker
 
 Container
 =======
-* `컨테이너`: 컨테이너는 격리된 공간에서 프로세스가 동작하는 기술
+* `컨테이너`: 컨테이너는 격리된 공간에서 `프로세스`가 동작하는 기술
 * 가상머신(OS 가상화)과 도커(컨테이너)의 차이: 기존의 가상머신들은 0S 자체를 가상화하여 호스트 OS 위에 게스트 OS 전체를 가상화하여 사용하였으나 컨테이너는 전체 OS를 가상화하는 방식이 아니기 때문에 가볍고 빠르다.
 * `이미지`: 컨테이너 실행에 필요한 파일과 설정값등을 포함하고 있는 것으로 상태값을 가지지 않고 변하지 않는다. 컨테이너는 이미지를 실행한 상태이다. `ex) Ubuntu, MySQL, Go, Redis, Nginx....`
 
@@ -36,13 +36,92 @@ Why_Popular
 Installation
 =======
 * 리눅스에서 도커 설치하기
-  * 
+  * Docker Script를 이용한 설치 
+  ```sh
+  $ curl -fsSL https://get.docker.com/ | sudo sh
+  ```
+  * Docker 설치 확인
+  ```sh
+  $ docker version
+  ```
+* 도커 실행 시의 특징: 도커는 하나의 실행파일이지만 실제로 클라이언트와 서버역할을 각각 할 수 있다. 도커 커맨드를 입력하면 도커 클라이언트가 도커 서버로 명령을 전송하고 결과를 받아 터미널에 출력한다.
 
 Run
 =======
+* 컨테이너 실행하기 
+  ```sh
+  $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+  ```
+* 컨테이너 실행 옵션
+| 옵션 | 설명 |
+|:--------|:--------|
+| -d | detached mode 흔히 말하는 백그라운드 모드 |
+| -p | 호스트와 컨테이너의 포트를 연결 (포워딩) |
+| -v | 호스트와 컨테이너의 디렉토리를 연결 (마운트) |
+| -e | 컨테이너 내에서 사용할 환경변수 설정 |
+| -name | 컨테이너 이름 설정 |
+| -rm | 프로세스 종료시 컨테이너 자동 제거 |
+| -it | -i와 -t를 동시에 사용한 것으로 터미널 입력을 위한 옵션 |
+| -link | 컨테이너 연결 [컨테이너명:별칭] |
+* 우분투 컨테이너 실행하기
+  * 컨테이너 실행하기
+  ```sh
+  $ sudo docker run ubuntu:16.04
+  ```
+  * 실행 프로세스가 전달된 컨테이너 실행
+  ```sh
+  $ sudo docker run --rm -it ubuntu:16.04 /bin/bash
+  ```
+* Redis 컨테이너 실행하기
+  * 컨테이너 실행하기
+  ```sh
+  $ sudo docker run -d -p 1234:6379 redis
+  ```
+* MySQL 컨테이너 실행하기
+  * 컨테이너 실행하기
+  ```sh
+  $ docker run -d -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true --name mysql mysql:5.7
+  ```
 
 Command
 =======
+* 컨테이너 목록 확인하기
+  * 컨테이너 확인하기
+  ```sh
+  $ docker ps [OPTIONS]
+  ```
+  * 실행 중인 모든 컨테이너 확인하기
+  ```sh
+  $ docker ps -a
+  ```
+* 컨테이너 중지하기
+  ```sh
+  $ docker stop [OPTIONS] CONTAINER [CONTAINER...]
+  ```
+* 컨테이너 제거하기
+  ```sh
+  $ docker rm [OPTIONS] CONTAINER [CONTAINER...]
+  ```
+* 다운로드된 이미지 목록 확인하기
+  ```sh
+  $ docker images [OPTIONS] [REPOSITORY[:TAG]]
+  ```
+* 이미지 다운로드하기
+  ```sh
+  $ docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+  ```
+* 이미지 삭제하기
+   ```sh
+   $ docker rmi [OPTIONS] IMAGE [IMAGE...]
+   ```
+* 컨테이너 로그 확인
+  ```sh
+  $ docker logs [OPTIONS] CONTAINER
+  ```
+* 구동 중인 컨테이너에 명령어 실행하기
+  ```sh
+  $ docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+  ```
 
 Docker_Compose
 =======
