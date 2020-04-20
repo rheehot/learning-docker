@@ -6,11 +6,11 @@ Table of contents
 <!--ts-->
    * [Docker](#Docker)
    * [Container](#Container)
-   * [Why_Popular](#Why_Popular)
+   * [Why Popular](#Why-Popular)
    * [Installation](#Installation)
    * [Run](#Run)
    * [Command](#Command)
-   * [Docker_compose](#Docker_compose)
+   * [Docker Compose](#Docker-Compose)
 <!--te-->
 
 Docker
@@ -26,7 +26,7 @@ Container
 * `이미지`: 컨테이너 실행에 필요한 파일과 설정값등을 포함하고 있는 것으로 상태값을 가지지 않고 변하지 않는다. 컨테이너는 이미지를 실행한 상태이다. `ex) Ubuntu, MySQL, Go, Redis, Nginx....`
 
 
-Why_Popular
+Why Popular
 =======
 * `레이어 저장 방식`: 유니온 파일 시스템을 이용하여 여러 개의 레이어를 하나의 파일시스템으로 사용하여 이미지 파일이 추가되거나 수정되면 새로운 레이어가 생성되고 기존의 레이어를 제외한 내용만 새로 디운로드 받기 때문에 효율적으로 이미지 관리를 할 수 있다.
 * `DockerFile`: 자체 DSL(Domain Specific Language)언어를 이용하여 이미지 생성 과정을 적는 DockerFile을 통해서 프로그램 설치 및 설정 과정을 간단하게 하고 쉽게 관리할 수 있다.
@@ -123,5 +123,5 @@ Command
   $ docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
   ```
 
-Docker_Compose
+Docker Compose
 =======
