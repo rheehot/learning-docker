@@ -11,6 +11,9 @@ Table of contents
    * [Run](#Run)
    * [Command](#Command)
    * [Docker Compose](#Docker-Compose)
+   * [Making Image](#Making-Image)
+   * [Docker Hub](#Docker-Hub)
+   * [Deployment](#Deployment)
 <!--te-->
 
 Docker
@@ -124,4 +127,65 @@ Command
   ```
 
 Docker Compose
+=======
+* `Docker Compose`: 컨테이너의 복잡한 설정을 쉽게 관리하기 위해 YAML방식의 설정파일을 이용하는 툴
+* Docker Compose 설치하기
+  * 설치하기
+  ```sh
+  $ curl -L "https://github.com/docker/compose/releases/download/1.9.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  ```
+  * 권한설정
+  ```sh
+  $ chmod +x /usr/local/bin/docker-compose
+  ```
+  * 설치확인
+  ```sh
+  $ docker-compose version
+  ``` 
+* docker-compose.yml 파일을 통해 Wordpress 컨테이너 만들기
+  * docker-compose.yml 파일 정의
+  ```yml
+      version: '2'
+      services:
+      db:
+      image: mysql:5.7
+      volumes:
+            - db_data:/var/lib/mysql
+      restart: always
+      environment:
+            MYSQL_ROOT_PASSWORD: wordpress
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: wordpress
+            MYSQL_PASSWORD: wordpress
+
+      wordpress:
+      depends_on:
+            - db
+      image: wordpress:latest
+      volumes:
+            - wp_data:/var/www/html
+      ports:
+            - "8000:80"
+      restart: always
+      environment:
+            WORDPRESS_DB_HOST: db:3306
+            WORDPRESS_DB_PASSWORD: wordpress
+      volumes:
+      db_data:
+      wp_data:
+  ```
+  * 실행하기
+  ```sh
+  $ docker-compose up
+  ```
+
+Making Image
+=======
+
+
+Docker Hub
+=======
+
+
+Deployment
 =======
