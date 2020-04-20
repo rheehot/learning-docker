@@ -32,7 +32,7 @@ Container
 Why Popular
 =======
 * `레이어 저장 방식`: 유니온 파일 시스템을 이용하여 여러 개의 레이어를 하나의 파일시스템으로 사용하여 이미지 파일이 추가되거나 수정되면 새로운 레이어가 생성되고 기존의 레이어를 제외한 내용만 새로 디운로드 받기 때문에 효율적으로 이미지 관리를 할 수 있다.
-* `DockerFile`: 자체 DSL(Domain Specific Language)언어를 이용하여 이미지 생성 과정을 적는 DockerFile을 통해서 프로그램 설치 및 설정 과정을 간단하게 하고 쉽게 관리할 수 있다.
+* `Dockerfile`: 자체 DSL(Domain Specific Language)언어를 이용하여 이미지 생성 과정을 적는 Dockerfile을 통해서 프로그램 설치 및 설정 과정을 간단하게 하고 쉽게 관리할 수 있다.
 * `Docker Hub`: 큰 용량의 이미지를 서버에 저장하고 관리하는 것은 쉽지 않은데 도커는 Docker Hub를 통해 공개 이미지를 무료로 관리해주는 서비스를 제공한다.
 * `Command와 API`: 도커의 대부분의 명령어는 직관적이고 사용하기 쉬우며 REST API도 지원하여 확장성이 좋다.
 
@@ -181,11 +181,146 @@ Docker Compose
 
 Making Image
 =======
+* 도커 이미지 만들기: 도커는 가상머신의 스냅샷과 같은 방식으로 애플리케이션을 설치하고 그 상태로 이미지를 저장한다.
+* Sinatra 애플리케이션 `Dockerizing`
+  * 패키지 파일과 소스 파일 생성
+  ```sh
+  $ vi Gemfile
+  ```
+  ```yml
+  source 'https://rubygems.org'
+  gem 'sinatra'
+  ```
+  ```sh
+  $ vi arr.rb
+  ```
+  ```ruby
+  require 'sinatra'
+  require 'socket'
+  get '/' do
+    Socket.gethostname
+  end
+  ```
+  * 도커를 활용하여 실행
+  ```sh
+  $ docker run --rm -p 4567:4567 -v $PWD:/usr/src/app -w /usr/src/app ruby bash -c "bundle install && bundle exec ruby app.rb -o 0.0.0.0"
+  ```
+  * Dockerfile 생성
+  ```yml
+    # 1. ubuntu 설치 (패키지 업데이트 + 만든사람 표시)
+  FROM       ubuntu:16.04
+  MAINTAINER subicura@subicura.com
+  RUN        apt-get -y update
 
+  # 2. ruby 설치
+  RUN apt-get -y install ruby
+  RUN gem install bundler
+
+  # 3. 소스 복사
+  COPY . /usr/src/app
+
+  # 4. Gem 패키지 설치 (실행 디렉토리 설정)
+  WORKDIR /usr/src/app
+  RUN     bundle install
+
+  # 5. Sinatra 서버 실행 (Listen 포트 정의)
+  EXPOSE 4567
+  CMD    bundle exec ruby app.rb -o 0.0.0.0
+  ```
+  또는
+  ```yml
+  FROM ruby:2.3
+  MAINTAINER subicura@subicura.com
+  COPY Gemfile* /usr/src/app/
+  WORKDIR /usr/src/app
+  RUN bundle install --no-rdoc --no-ri
+  COPY . /usr/src/app
+  EXPOSE 4567
+  CMD bundle exec ruby app.rb -o 0.0.0.0
+  ```
+  * 이미지 빌드하기
+  ```sh
+  $ docker build [OPTIONS] PATH | URL | -
+  ```
+  * 이미지 확인하기
+  ```sh
+  $ docker images
+  ```
+* Dockerfile 기본 명령어
+  * FROM: 베이스 이미지를 저장
+  ```yml
+  FROM <image>:<tag>
+  FROM ubuntu:16.04
+  ```
+  * MAINTAINER: Dockerfile을 관리하는 사람의 정보를 저장 
+  ```yml
+  MAINTAINER <name>
+  MAINTAINER subicura@subicura.com
+  ```
+  * COPY: 파일이나 디렉토리를 이미지로 복사
+  ```yml
+  COPY <src>... <dest>
+  COPY . /usr/src/app
+  ```  
+  * ADD: COPY와 유사하나 `src`에 파일 대신 URL을 입력할 수 있음 
+  ```yml
+  ADD <src>... <dest>
+  ADD . /usr/src/app
+  ``` 
+  * RUN: 명령을 실행
+  ```yml
+  RUN <command>
+  RUN ["executable", "param1", "param2"]
+  RUN bundle install
+  ``` 
+  * CMD: 도커 컨테이너가 구동됐을 때 실행할 명령어를 정의
+  ```yml
+  CMD ["executable","param1","param2"]
+  CMD command param1 param2
+  CMD bundle exec ruby app.rb
+  ``` 
+  * WORKDIR: RUN, CMD, ADD, COPY등이 이루어질 기본 디렉토리를 설정
+  ```yml
+  WORKDIR /path/to/workdir
+  ```
+  * EXPOSE: 도커 컨테이너가 실행되었을 때 요청을 기다리고 있는(Listen) 포트를 지정
+  ```yml
+  EXPOSE <port> [<port>...]
+  EXPOSE 4567
+  ``` 
+  * VOLUME: 컨테이너 외부에 파일시스템을 마운트 할 때 사용
+  ```yml
+  VOLUME ["/data"]
+  ``` 
+  * ENV: 컨테이너에서 사용할 환경변수를 지정
+  ```yml
+  ENV <key> <value>
+  ENV <key>=<value> ...
+  ENV DB_URL mysql
+  ``` 
 
 Docker Hub
 =======
-
+* `도커 레지스트리`: 도커는 빌드한 이미지를 서버에 배포하기 위해 직접 파일을 복사하는 방법 대신 도커 레지스트리 `Docker Registry`라는 이미지 저장소를 사용하여 push와 pull하는 구조이다. `Docker Registry`를 사용하기 싫다면 `Docker Hub`를 사용할 수 있다.
+* `Docker Hub`: 도커에서 제공하는 기본 이미지 저장소로 대용량의 이미지를 무료로 저장 및 다운로드 할 수 있다. 단, 기본적으로 모든 이미지는 공개되어 누구나 접근 가능하므로 비공개로 사용하려면 유료 서비스를 이용해야한다.
+* Docker Hub 사용하기
+  * 도커 허브 페이지에서 회원 가입을 하고 허브 계정을 사용하기
+  ```sh
+  $ docker login
+  ```
+  * 도커 이미지 태깅하기
+  ```
+  $ docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+  ```
+  cf) 도커 이미지 구조: `[사용자 ID]/[이미지명]:[tag]`
+  * 도커 허브에 이미지를 전송
+  ```sh
+  $ docker push IMAGE[:TAG]
+  ```
 
 Deployment
 =======
+* 도커 배포하기
+  * 서버 환경에서 등록된 이미지를 다운받고 컨테이너를 실행
+* 도커 컨테이너 업데이트하기
+  * 최신 이미지를 기반으로 새 컨테이너를 만들고 이전 컨테이너를 삭제
