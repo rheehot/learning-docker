@@ -14,6 +14,7 @@ Table of contents
    * [Making Image](#Making-Image)
    * [Docker Hub](#Docker-Hub)
    * [Deployment](#Deployment)
+   * [Docker API](#Docker-API)
 <!--te-->
 
 Docker
@@ -34,7 +35,9 @@ Why Popular
 * `레이어 저장 방식`: 유니온 파일 시스템을 이용하여 여러 개의 레이어를 하나의 파일시스템으로 사용하여 이미지 파일이 추가되거나 수정되면 새로운 레이어가 생성되고 기존의 레이어를 제외한 내용만 새로 디운로드 받기 때문에 효율적으로 이미지 관리를 할 수 있다.
 * `Dockerfile`: 자체 DSL(Domain Specific Language)언어를 이용하여 이미지 생성 과정을 적는 Dockerfile을 통해서 프로그램 설치 및 설정 과정을 간단하게 하고 쉽게 관리할 수 있다.
 * `Docker Hub`: 큰 용량의 이미지를 서버에 저장하고 관리하는 것은 쉽지 않은데 도커는 Docker Hub를 통해 공개 이미지를 무료로 관리해주는 서비스를 제공한다.
-* `Command와 API`: 도커의 대부분의 명령어는 직관적이고 사용하기 쉬우며 REST API도 지원하여 확장성이 좋다.
+* `Command와 API`: 도커의 대부분의 명령어는 직관적이고 사용하기 쉬우며 `Docker REST API`도 지원하여 확장성이 좋다.
+* `배포 효율성`: 명령어를 통해 쉽게 프로그램을 배포 확장할 수 있고 실행 시점에 상관없이 구성 시점을 채택할 수 있다.
+* `성능`: 이미지 용량이 크게 줄어든다.
 
 Installation
 =======
@@ -47,7 +50,11 @@ Installation
   ```sh
   $ docker version
   ```
-* 도커 실행 시의 특징: 도커는 하나의 실행파일이지만 실제로 클라이언트와 서버역할을 각각 할 수 있다. 도커 커맨드를 입력하면 도커 클라이언트가 도커 서버로 명령을 전송하고 결과를 받아 터미널에 출력한다.
+  * Docker에 sudo 권한 부여
+  ```sh
+  $ sudo setfacl -m user:$USER:rw /var/run/docker.sock
+  ```
+* 도커 실행 시의 특징: 도커는 하나의 실행파일이지만 실제로 클라이언트와 서버역할을 각각 할 수 있다. 도커 커맨드를 입력하면 도커 클라이언트가 도커 서버로 명령을 전송하고 결과를 받아 터미널에 출력하는 구조이다.
 
 Run
 =======
@@ -71,7 +78,7 @@ Run
   ```sh
   $ sudo docker run ubuntu:16.04
   ```
-  * 실행 프로세스가 전달된 컨테이너 실행
+  * 실행 프로세스(Bash)가 전달된 컨테이너 실행
   ```sh
   $ sudo docker run --rm -it ubuntu:16.04 /bin/bash
   ```
@@ -97,6 +104,10 @@ Command
   ```sh
   $ docker ps -a
   ```
+* 컨테이너 실행하기
+  ```sh
+  $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+  ```
 * 컨테이너 중지하기
   ```sh
   $ docker stop [OPTIONS] CONTAINER [CONTAINER...]
@@ -104,6 +115,18 @@ Command
 * 컨테이너 제거하기
   ```sh
   $ docker rm [OPTIONS] CONTAINER [CONTAINER...]
+  ```
+* 이미지 빌드하기
+  ```sh
+  $ docker build [OPTIONS] PATH | URL | -
+  ```
+* 이미지 태깅하기
+  ```sh
+  $ docker tag  [IMAGE>[:TAG]] [Docker REGISTRY URL]/[IMAGE[:태그]
+  ```
+* 이미지 업로드하기
+  ```sh
+  $ docker push [Docker REGISTRY URL]/[IMAGE[:TAG]]
   ```
 * 다운로드된 이미지 목록 확인하기
   ```sh
@@ -117,6 +140,10 @@ Command
    ```sh
    $ docker rmi [OPTIONS] IMAGE [IMAGE...]
    ```
+* 이미지 내역 확인하기
+  ```sh
+  $ docker image history IMAGE
+  ```
 * 컨테이너 로그 확인
   ```sh
   $ docker logs [OPTIONS] CONTAINER
@@ -124,6 +151,10 @@ Command
 * 구동 중인 컨테이너에 명령어 실행하기
   ```sh
   $ docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+  ```
+* 구동 중인 컨테이너에 지속적 명령을 위해 접속하기
+  ```sh
+  $ docker exec -it CONTAINER /bin/bash
   ```
 
 Docker Compose
@@ -183,7 +214,7 @@ Making Image
 =======
 * 도커 이미지 만들기: 도커는 가상머신의 스냅샷과 같은 방식으로 애플리케이션을 설치하고 그 상태로 이미지를 저장한다.
 * Sinatra 애플리케이션 `Dockerizing`
-  * 패키지 파일과 소스 파일 생성
+  * Ruby 패키지 파일 생성
   ```sh
   $ vi Gemfile
   ```
@@ -191,6 +222,7 @@ Making Image
   source 'https://rubygems.org'
   gem 'sinatra'
   ```
+  * Ruby 소스 파일 생성
   ```sh
   $ vi arr.rb
   ```
@@ -205,9 +237,9 @@ Making Image
   ```sh
   $ docker run --rm -p 4567:4567 -v $PWD:/usr/src/app -w /usr/src/app ruby bash -c "bundle install && bundle exec ruby app.rb -o 0.0.0.0"
   ```
-  * Dockerfile 생성
+  * Dockerfile(빌드 파일) 생성
   ```yml
-    # 1. ubuntu 설치 (패키지 업데이트 + 만든사람 표시)
+  # 1. ubuntu 설치 (패키지 업데이트 + 만든사람 표시)
   FROM       ubuntu:16.04
   MAINTAINER subicura@subicura.com
   RUN        apt-get -y update
@@ -240,7 +272,7 @@ Making Image
   ```
   * 이미지 빌드하기
   ```sh
-  $ docker build [OPTIONS] PATH | URL | -
+  $ docker build -t app .
   ```
   * 이미지 확인하기
   ```sh
@@ -250,52 +282,74 @@ Making Image
   * FROM: 베이스 이미지를 저장
   ```yml
   FROM <image>:<tag>
+  ```
+  ```yml
   FROM ubuntu:16.04
   ```
   * MAINTAINER: Dockerfile을 관리하는 사람의 정보를 저장 
   ```yml
   MAINTAINER <name>
+  ```
+  ```yml
   MAINTAINER subicura@subicura.com
   ```
   * COPY: 파일이나 디렉토리를 이미지로 복사
   ```yml
   COPY <src>... <dest>
+  ```
+  ```yml
   COPY . /usr/src/app
   ```  
   * ADD: COPY와 유사하나 `src`에 파일 대신 URL을 입력할 수 있음 
   ```yml
   ADD <src>... <dest>
+  ```
+  ```yml
   ADD . /usr/src/app
   ``` 
   * RUN: 명령을 실행
   ```yml
   RUN <command>
   RUN ["executable", "param1", "param2"]
+  ```
+  ```yml
   RUN bundle install
   ``` 
   * CMD: 도커 컨테이너가 구동됐을 때 실행할 명령어를 정의
   ```yml
   CMD ["executable","param1","param2"]
-  CMD command param1 param2
+  CMD <command> <param1> <param2>
+  ```
+  ```yml
   CMD bundle exec ruby app.rb
   ``` 
   * WORKDIR: RUN, CMD, ADD, COPY등이 이루어질 기본 디렉토리를 설정
+  ```yml
+  WORKDIR <path>
+  ```
   ```yml
   WORKDIR /path/to/workdir
   ```
   * EXPOSE: 도커 컨테이너가 실행되었을 때 요청을 기다리고 있는(Listen) 포트를 지정
   ```yml
   EXPOSE <port> [<port>...]
+  ```
+  ```yml
   EXPOSE 4567
   ``` 
   * VOLUME: 컨테이너 외부에 파일시스템을 마운트 할 때 사용
   ```yml
+  VOLUME <path>
+  ```
+  ```
   VOLUME ["/data"]
   ``` 
   * ENV: 컨테이너에서 사용할 환경변수를 지정
   ```yml
   ENV <key> <value>
   ENV <key>=<value> ...
+  ```
+  ```yml
   ENV DB_URL mysql
   ``` 
 
@@ -324,3 +378,13 @@ Deployment
   * 서버 환경에서 등록된 이미지를 다운받고 컨테이너를 실행
 * 도커 컨테이너 업데이트하기
   * 최신 이미지를 기반으로 새 컨테이너를 만들고 이전 컨테이너를 삭제
+
+
+Docker API
+=======
+* 컨테이너 리스트 얻기: `GET /containers/json`
+* 컨테이너 생성: `POST /containers/create` + Request Body
+* 컨테이너 시작: `POST /containers/{id}/start`
+* 컨테이너 정지: `POST /containers/{id}/stop`
+* 컨테이너 재시작: `POST /containers/{id}/restart`
+* 컨테이너 종료: `POST /containers/{id}/kill`
