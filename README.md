@@ -15,6 +15,7 @@ Table of contents
    * [Docker Hub](#Docker-Hub)
    * [Deployment](#Deployment)
    * [Docker API](#Docker-API)
+   * [Advance](#Advance)
 <!--te-->
 
 Docker
@@ -29,7 +30,7 @@ Container
 =======
 * `컨테이너`: 컨테이너는 격리된 공간에서 `프로세스`가 동작하는 기술
 * 가상머신(OS 가상화)과 도커(컨테이너)의 차이: 기존의 가상머신들은 0S 자체를 가상화하여 호스트 OS 위에 게스트 OS 전체를 가상화하여 사용하였으나 컨테이너는 전체 OS를 가상화하는 방식이 아니기 때문에 가볍고 빠르다.
-* `이미지`: 컨테이너 실행에 필요한 파일과 설정값등을 포함하고 있는 것으로 상태값을 가지지 않고 변하지 않는다. 컨테이너는 이미지를 실행한 상태이다. `ex) Ubuntu, MySQL, Go, Redis, Nginx....`
+* `이미지`: 컨테이너 실행에 필요한 파일과 설정값등을 포함하고 있는 것으로 상태값을 가지지 않고 변하지 않는다. 이미지는 컨테이너의 템플릿이고 컨테이너는 이미지를 실행한 상태이다. `ex) Ubuntu, MySQL, Go, Redis, Nginx....`
 * `컨테이너 오케스트레이션 도구`: `Docker Compose`와 `Docker Swarm` 그리고 `Kubernetes`가 존재한다. 단일 서버의 여러 컨테이너 관리만이 목적이라면 Docker Compose를 사용하고 여러 서버에 걸쳐 있는 여러 컨테이너를 관리가 목적이라면 `Docker Swarm`와 `Kubernetes`를 사용한다.
 
 Why Popular
@@ -62,15 +63,15 @@ Run
 =======
 * 컨테이너 실행하기 
   ```sh
-  $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+  $ docker run [OPTIONS] IMAGE[:TAG] [COMMAND] [ARG...]
   ```
 * 컨테이너 실행 옵션  
 
 | 옵션 |설명 |
 |:--------|:--------|
 | `-d` | detached mode 흔히 말하는 백그라운드 모드 |
-| `-p` | 호스트와 컨테이너의 포트를 연결 (포워딩) |
-| `-v` | 호스트와 컨테이너의 디렉토리를 연결 (마운트) |
+| `-p` | 호스트 포트와 컨테이너 포트를 연결 (포워딩) |
+| `-v` | 호스트와 컨테이너의 디렉토리를 연결 (마운트) - 데이터 볼륨 |
 | `-e` | 컨테이너 내에서 사용할 환경변수 설정 |
 | `-name` | 컨테이너 이름 설정 |
 | `-rm` | 프로세스 종료시 컨테이너 자동 제거 |
@@ -104,49 +105,21 @@ Command
   ```sh
   $ docker ps [OPTIONS]
   ```
-  * 실행 중인 모든 컨테이너 확인하기
-  ```sh
-  $ docker ps -a
-  ```
 * 컨테이너 실행하기
   ```sh
-  $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+  $ docker run [OPTIONS] IMAGE[:TAG] [COMMAND] [ARG...]
   ```
 * 컨테이너 중지하기
   ```sh
   $ docker stop [OPTIONS] CONTAINER [CONTAINER...]
   ```
+* 컨테이너 재시작하기
+  ```sh
+  $ docker restart [OPTIONS] CONTAINER [CONTAINER...]
+  ```
 * 컨테이너 제거하기
   ```sh
   $ docker rm [OPTIONS] CONTAINER [CONTAINER...]
-  ```
-* 이미지 빌드하기
-  ```sh
-  $ docker build [OPTIONS] PATH | URL | -
-  ```
-* 이미지 태깅하기
-  ```sh
-  $ docker tag  [IMAGE>[:TAG]] [Docker REGISTRY URL]/[IMAGE[:태그]
-  ```
-* 이미지 업로드하기
-  ```sh
-  $ docker push [Docker REGISTRY URL]/[IMAGE[:TAG]]
-  ```
-* 다운로드된 이미지 목록 확인하기
-  ```sh
-  $ docker images [OPTIONS] [REPOSITORY[:TAG]]
-  ```
-* 이미지 다운로드하기
-  ```sh
-  $ docker pull [OPTIONS] NAME[:TAG|@DIGEST]
-  ```
-* 이미지 삭제하기
-   ```sh
-   $ docker rmi [OPTIONS] IMAGE [IMAGE...]
-   ```
-* 이미지 내역 확인하기
-  ```sh
-  $ docker image history IMAGE
   ```
 * 컨테이너 로그 확인
   ```sh
@@ -160,10 +133,38 @@ Command
   ```sh
   $ docker exec -it CONTAINER /bin/bash
   ```
+* 이미지 빌드하기
+  ```sh
+  $ docker build IMAGE[:TAG] Dockerfile_PATH
+  ```
+* 이미지 태깅하기
+  ```sh
+  $ docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+  ```
+* 이미지 업로드하기
+  ```sh
+  $ docker push Docker_REGISTRY_URL/IMAGE[:TAG]
+  ```
+* 다운로드된 이미지 목록 확인하기
+  ```sh
+  $ docker images [OPTIONS] [REPOSITORY[:TAG]]
+  ```
+* 이미지 다운로드하기
+  ```sh
+  $ docker pull [OPTIONS] REPOSITORY_NAME[:TAG|]
+  ```
+* 이미지 삭제하기
+   ```sh
+   $ docker rmi [OPTIONS] IMAGE [IMAGE...]
+   ```
+* 이미지 내역 확인하기
+  ```sh
+  $ docker image history IMAGE
+  ```
 
 Docker Compose
 =======
-* `Docker Compose`: 컨테이너의 복잡한 설정을 쉽게 관리하기 위해 YAML방식의 설정파일을 이용하는 툴
+* `Docker Compose`: 하나의 호스트 안에 있는 여러 컨테이너의 복잡한 설정을 쉽게 관리하기 위해 YAML방식의 설정파일을 이용하는 툴
 * Docker Compose 설치하기
   * 설치하기
   ```sh
@@ -213,6 +214,18 @@ Docker Compose
   ```sh
   $ docker-compose up
   ```
+  * 정지하기
+  ```sh
+  $ docker-compose down
+  ```
+* docker-compose yml 형식
+  * `version`: docker compose 문법 버전
+  * `services`: 컨테이너 이름
+  * `images`: 도커의 이미지
+  * `ports`: 포트포워딩 설정
+  * `build`: image 속성 대신 사용하는 요소로 Dockerfile의 경로를 지정
+  * `volumes`: 호스트와 컨테이너 사이에 파일을 공유할 수 있는 매커니즘
+
 
 Making Image
 =======
@@ -311,17 +324,17 @@ Making Image
   ```yml
   ADD . /usr/src/app
   ``` 
-  * RUN: 컨테이너 안에서 실행한 명령 정의
+  * RUN: 이미지를 빌드할 때 실행되는 컨테이너 안에서 실행할 명령 정의
   ```yml
+  RUN ["executable", "param1", "param2"] (추천)
   RUN <command>
-  RUN ["executable", "param1", "param2"]
   ```
   ```yml
   RUN bundle install
   ``` 
-  * CMD: 도커 컨테이너가 구동됐을 때 실행할 명령어를 정의
+  * CMD: 도커 컨테이너가 구동을 시작했을 때 실행할 명령어를 정의
   ```yml
-  CMD ["executable","param1","param2"]
+  CMD ["executable", "param1", "param2"] (추천)
   CMD <command> <param1> <param2>
   ```
   ```yml
@@ -348,8 +361,7 @@ Making Image
   ```
   VOLUME ["/data"]
   ``` 
-  * ENV: 컨테이너에서 사용할 환경변수를 지정
-  ```yml
+  * ENV: 컨테이너에서 사용할 환경변수를 지정는
   ENV <key> <value>
   ENV <key>=<value> ...
   ```
@@ -392,3 +404,21 @@ Docker API
 * 컨테이너 정지: `POST /containers/{id}/stop`
 * 컨테이너 재시작: `POST /containers/{id}/restart`
 * 컨테이너 종료: `POST /containers/{id}/kill`
+
+Advance
+=======
+* 애플리케이션과 시스템 내 단일 컨테이너의 적정 비중
+  * 컨테이너 1개 == 프로세스 1개가 아닌 컨테이너 1개는 `한가지 역할이나 문제 영역에 집중하는 것`이 옳은 설계이므로 컨테이너가 맡을 역할을 적절히 나누고 시스템에 설계해야한다.
+* 컨테이너의 이식성
+  * 이식성: 도커의 장점으로 어떤 호스트 운영체제와 플랫폼에서든 그대로 동작하는 것이 장점이다.
+  * 도커의 이식성이 사라지는 경우
+    1. 호스트 운영체제와 커널 리소스를 공유하기 때문에, `x86_64` 아키텍처 리눅스 기반 호스트에서만 실행이 보장된다.
+    2. `동적 링크`의 경우 라이브러리가 다르다면 동작하지 않으므로 되도록 네이티브 라이브러리를 정적 링크하여 이미지를 빌드해야한다.
+* 환경 변수 사용
+  * 실행 시 인자 사용: CMD같은 명령을 통해서 실행할 때 사용할 명령을 정의할 수 있으나 명령이 많아지면 관리하기가 어려워질 수 있다.
+  * 애플리케이션 설정 파일 사용: maven이나 gradle같은 애플리케이션 설정 파일을 통해서 제어하면 도커 이미지를 각각의 설정 파일 별로 만들어 둬야한다. 
+  * 애플리케이션 동작을 환경 변수로 제어: 매번 이미지를 다시 빌드하지 않아도 되지만, 게층 구조를 가지기는 어렵다.
+  * 애플리케이션 설정 파일에 환경 변수로 제어: 설정 파일에서 환경 변수를 포함할 수 있다면 환경 변수를 포함한 파일을 이미지로 되므로 가장 좋은 방법이다.
+* 영속적인 데이터를 다루는 방법
+  * `데이터 볼륨`: 컨테이너 안의 디렉토리를 디스크에 퍼시스턴스 데이터로 남기기 위한 매커니즘으로 `호스트`와 `컨테이너` 사이의 지정한 디렉터리 공유 및 재사용 기능을 제공하여 컨테이너를 파기해도 디스크에 남아 영속적으로 데이터를 저장할 수 있다.
+  * `데이터 볼륨 컨테이너`: 컨테이너 간의 디렉토리를 공유하는 매커니즘으로 디스크에 저장된 컨테이너가 갖는 퍼시스턴스 데이터를 볼륨으로 만들어 다른 컨테이너에 공유하는 데이터를 저장하는 것만이 목적인 컨테이너를 이용하여 `var/lib/docker/volumes/` 아래에 볼륨을 위치시켜 영속적으로 데이터를 저장할 수 있다. 
