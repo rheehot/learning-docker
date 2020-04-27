@@ -62,7 +62,7 @@ Run
   ```sh
   $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
   ```
-* 컨테이너 실행 옵션
+* 컨테이너 실행 옵션  
 | 옵션 | 설명 |
 |:--------|:--------|
 | -d | detached mode 흔히 말하는 백그라운드 모드 |
