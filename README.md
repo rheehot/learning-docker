@@ -15,7 +15,7 @@ Table of contents
    * [Docker Hub](#Docker-Hub)
    * [Deployment](#Deployment)
    * [Docker API](#Docker-API)
-   * [Advance](#Advance)
+   * [Advanced](#Advanced)
 <!--te-->
 
 Docker
@@ -405,7 +405,7 @@ Docker API
 * 컨테이너 재시작: `POST /containers/{id}/restart`
 * 컨테이너 종료: `POST /containers/{id}/kill`
 
-Advance
+Advanced
 =======
 * 애플리케이션과 시스템 내 단일 컨테이너의 적정 비중
   * 컨테이너 1개 == 프로세스 1개가 아닌 컨테이너 1개는 `한가지 역할이나 문제 영역에 집중하는 것`이 옳은 설계이므로 컨테이너가 맡을 역할을 적절히 나누고 시스템에 설계해야한다.
