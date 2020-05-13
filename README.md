@@ -255,10 +255,6 @@ Making Image
     Socket.gethostname
   end
   ```
-  * 도커를 활용하여 실행
-  ```sh
-  $ docker run --rm -p 4567:4567 -v $PWD:/usr/src/app -w /usr/src/app ruby bash -c "bundle install && bundle exec ruby app.rb -o 0.0.0.0"
-  ```
   * Dockerfile(빌드 파일) 생성
   ```yml
   # 1. ubuntu 설치 (패키지 업데이트 + 만든사람 표시)
