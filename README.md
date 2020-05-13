@@ -152,11 +152,11 @@ Command
   ```
 * 다운로드된 이미지 목록 확인하기
   ```sh
-  $ docker images [OPTIONS] [REPOSITORY[:TAG]]
+  $ docker images [OPTIONS] [REPOSITORY[:TAG]
   ```
 * 이미지 다운로드하기
   ```sh
-  $ docker pull [OPTIONS] REPOSITORY_NAME[:TAG|]
+  $ docker pull [OPTIONS] REPOSITORY_NAME[:TAG]
   ```
 * 이미지 삭제하기
    ```sh
