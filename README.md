@@ -186,9 +186,9 @@ Docker Compose
 * docker-compose.yml 파일을 통해 Wordpress 컨테이너 만들기
   * docker-compose.yml 파일 정의
   ```yml
-      version: '2'
-      services:
-      db:
+  version: '2'
+  services:
+    db:
       image: mysql:5.7
       volumes:
             - db_data:/var/lib/mysql
@@ -198,8 +198,7 @@ Docker Compose
             MYSQL_DATABASE: wordpress
             MYSQL_USER: wordpress
             MYSQL_PASSWORD: wordpress
-
-      wordpress:
+    wordpress:
       depends_on:
             - db
       image: wordpress:latest
@@ -211,9 +210,9 @@ Docker Compose
       environment:
             WORDPRESS_DB_HOST: db:3306
             WORDPRESS_DB_PASSWORD: wordpress
-      volumes:
-      db_data:
-      wp_data:
+  volumes:
+    db_data:
+    wp_data:
   ```
   * 실행하기
   ```sh
