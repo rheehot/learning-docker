@@ -359,13 +359,12 @@ Making Image
   ```yml
   VOLUME <path>
   ```
-  ```
+  ```yml
   VOLUME ["/data"]
   ``` 
   * ENV: 컨테이너에서 사용할 환경변수를 지정는
   ENV <key> <value>
   ENV <key>=<value> ...
-  ```
   ```yml
   ENV DB_URL mysql
   ``` 
